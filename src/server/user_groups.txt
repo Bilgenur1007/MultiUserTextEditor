@@ -1,0 +1,4 @@
+sena:group1,group2
+bilge:group1,group2
+admin:group2
+burcu:group1

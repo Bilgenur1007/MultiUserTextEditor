@@ -67,4 +67,27 @@ public class UserManager {
         String password = args[1];
         addUser(username, password);
     }
+    public static List<String> getUserGroups(String username) {
+        List<String> groups = new ArrayList<>();
+        File groupFile = new File("src/server/user_groups.txt");
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(groupFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(":");
+                if (parts.length == 2 && parts[0].trim().equals(username)) {
+                    String[] userGroups = parts[1].split(",");
+                    for (String group : userGroups) {
+                        groups.add(group.trim());
+                    }
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("❌ user_groups.txt okunamadı.");
+        }
+
+        return groups;
+    }
+
 }

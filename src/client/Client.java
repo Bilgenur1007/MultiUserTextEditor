@@ -23,24 +23,33 @@ public class Client {
             String password = scanner.nextLine();
             out.println(password);
 
-            // Giriş sonucu
+            // Sunucudan login yanıtı
             String response = in.readLine();
-            if (response != null && response.contains("LOGIN_SUCCESS")) {
-                System.out.println("🎉 Giriş başarılı!");
+            if (response.contains("LOGIN_SUCCESS")) {
+                // 1) Grupları dinle
+                System.out.println(in.readLine()); // “Ait olduğunuz gruplar...”
+                System.out.print(in.readLine());   // “Bir grup seçin: ”
+                String chosenGroup = scanner.nextLine();
+                out.println(chosenGroup);
 
-                System.out.println("📄 Lütfen dosyaya kaydetmek istediğiniz içeriği girin:");
-                String content = scanner.nextLine();
-                out.println("CONTENT:" + content);
-
-                // İstersen server'dan onay bekleyebilirsin, örn:
-                String confirm = in.readLine();
-                if (confirm != null && confirm.contains("CONTENT_SAVED")) {
-                    System.out.println("İçerik başarıyla kaydedildi.");
+                // 2) Grup dosyalarını al
+                String line;
+                while ((line = in.readLine()) != null) {
+                    if (line.startsWith("📄 Bu gruba eklemek")) break;
+                    System.out.println(line);
                 }
 
+                // 3) İçerik ekleme
+                System.out.print("Eklemek istediğiniz içeriği girin: ");
+                String content = scanner.nextLine();
+                out.println(content);
+
+                // 4) Onayı al
+                System.out.println(in.readLine());
             } else {
-                System.out.println("❌ Giriş başarısız.");
+                System.out.println("LOGIN_FAILED");
             }
+
 
         } catch (IOException e) {
             e.printStackTrace();
