@@ -29,6 +29,29 @@ public class Server {
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         ) {
+                    String command = in.readLine();
+                    if ("SAVE_MODE".equals(command)) {
+                        String username = in.readLine();
+                        String group = in.readLine();
+                        String content = in.readLine();
+
+                        String filePath;
+                        if (!"NONE".equals(group)) {
+                            filePath = "group_contents/" + group + ".txt";
+                        } else {
+                            filePath = "user_contents/" + username + ".txt";
+                        }
+
+                        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
+                            writer.println(content);
+                            out.println("✅ İçerik başarıyla kaydedildi: " + filePath);
+                        } catch (IOException e) {
+                            out.println("❌ Kaydetme hatası: " + e.getMessage());
+                        }
+
+                        return; // Burada işi bitiriyoruz, kaydet ve çık
+                    }
+
             out.println("USERNAME: ");
             String username = in.readLine();
 
@@ -43,6 +66,15 @@ public class Server {
 
             if (authenticated) {
                 out.println("LOGIN_SUCCESS");
+
+                // Grup bilgisini gönder
+                List<String> userGroups = GroupManager.getUserGroups(username);
+                if (!userGroups.isEmpty()) {
+                    out.println("GROUP:" + userGroups.get(0)); // İlk grup
+                } else {
+                    out.println("GROUP:NONE");
+                }
+
                 saveUserContent(username, "Giriş yaptı.");
 
                 // 2) Grup listesini gönder ve seçim al

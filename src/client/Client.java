@@ -1,4 +1,5 @@
 package client;
+
 import java.util.Scanner;
 import java.io.*;
 import java.net.*;
@@ -14,7 +15,7 @@ public class Client {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             Scanner scanner = new Scanner(System.in);
         ) {
-            // Kullanıcı adı isteği
+            // Kullanıcı adı ve parola gir
             System.out.print(in.readLine()); // USERNAME:
             String username = scanner.nextLine();
             out.println(username);
@@ -23,37 +24,48 @@ public class Client {
             String password = scanner.nextLine();
             out.println(password);
 
-            // Sunucudan login yanıtı
-            String response = in.readLine();
-            if (response.contains("LOGIN_SUCCESS")) {
-                // 1) Grupları dinle
-                System.out.println(in.readLine()); // “Ait olduğunuz gruplar...”
-                System.out.print(in.readLine());   // “Bir grup seçin: ”
-                String chosenGroup = scanner.nextLine();
-                out.println(chosenGroup);
+            String loginResult = in.readLine();
+            if ("LOGIN_SUCCESS".equals(loginResult)) {
+                System.out.println("✅ Giriş başarılı.");
 
-                // 2) Grup dosyalarını al
+                String groupLine = in.readLine(); // Örn: GROUP:grup1
+                System.out.println(groupLine);
+
+                // Grup listesi ve seçim
+                String groupList = in.readLine();
+                System.out.println(groupList);
+
+                String prompt = in.readLine(); // 📌 Bir grup seçin:
+                System.out.print(prompt);
+                String selectedGroup = scanner.nextLine();
+                out.println(selectedGroup);
+
+                String accessCheck = in.readLine();
+                if (accessCheck.startsWith("🚫")) {
+                    System.out.println(accessCheck);
+                    return;
+                }
+
+                // Grup dosyalarını listele
                 String line;
-                while ((line = in.readLine()) != null) {
-                    if (line.startsWith("📄 Bu gruba eklemek")) break;
+                while ((line = in.readLine()) != null && !line.startsWith("📄")) {
                     System.out.println(line);
                 }
 
-                // 3) İçerik ekleme
-                System.out.print("Eklemek istediğiniz içeriği girin: ");
+                // İçerik girme
+                System.out.print("📄 Bu gruba eklemek istediğiniz içerik: ");
                 String content = scanner.nextLine();
                 out.println(content);
 
-                // 4) Onayı al
-                System.out.println(in.readLine());
+                String result = in.readLine();
+                System.out.println(result);
+
             } else {
-                System.out.println("LOGIN_FAILED");
+                System.out.println("❌ Giriş başarısız.");
             }
 
-
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("⚠️ Sunucuya bağlanılamadı: " + e.getMessage());
         }
     }
-
 }

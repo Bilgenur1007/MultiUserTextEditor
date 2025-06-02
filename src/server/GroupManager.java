@@ -79,4 +79,37 @@ public class GroupManager {
             default: System.out.println("Bilinmeyen komut");
         }
     }
+
+    public static List<String> getUserGroups(String username) {
+        List<String> groups = new ArrayList<>();  // boş listeyle başlıyoruz
+        File file = new File("src/server/user_groups.txt");  // önce bu yolu sabitleyelim
+
+        if (!file.exists()) {
+            System.out.println("❌ user_groups.txt bulunamadı.");
+            return groups; // boş ama null değil
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(":");
+                if (parts.length == 2) {
+                    String user = parts[0].trim();
+                    String[] groupArray = parts[1].split(",");
+                    if (user.equals(username)) {
+                        for (String group : groupArray) {
+                            if (group != null && !group.trim().isEmpty()) {
+                                groups.add(group.trim());
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("❌ user_groups.txt okunamadı: " + e.getMessage());
+        }
+
+        return groups;  // asla null dönmüyor
+    }
+
 }
